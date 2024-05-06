@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phyllotaxis</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            background-color : rgb(0,0,0);
+            margin: 0;
+            text-align : center;
+        }
+        #regenerateBtn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <button id="regenerateBtn">Regenerate</button>
+    <script>
+        var n = 0;
+        var c = 4;
+        var colors = [
+            [255, 0, 0], // Red
+            [0, 255, 0], // Green
+            [0, 0, 255]  // Blue
+        ];
+        var elastic = 0;
+
+        function setup() {
+            createCanvas(windowWidth-30, windowHeight-50);
+            angleMode(DEGREES);
+            background(0);
+            fill(255);
+            textAlign(LEFT);
+            textSize(12);
+            text("Phyllotaxis", 10, 50);
+
+            // Add click event listener to the regenerate button
+            document.getElementById('regenerateBtn').addEventListener('click', regenerateSketch);
+        }
+
+        function draw() {
+            var a = n * 137.5;
+            var r = c * sqrt(n);
+
+            var x = r * cos(a) + width/2;
+            var y = r * sin(a) + height/2;
+
+            // Apply elastic effect when mouse is pressed
+            if (elastic > 0) {
+                x += random(-elastic, elastic);
+                y += random(-elastic, elastic);
+            }
+
+            // Check if the current position (x, y) is outside the canvas boundaries
+            if (x < 0 || x > width || y < 0 || y > height) {
+                noLoop(); // Stop the draw loop
+            } else {
+                // Interpolate between colors based on the value of n
+                var index = Math.floor(map(n, 0, 100, 0, colors.length - 1)) % colors.length;
+                var nextIndex = (index + 1) % colors.length;
+                var inter = map(n % 1000, 0, 100, 0, 1);
+                var c1 = colors[index];
+                var c2 = colors[nextIndex];
+                var color = [
+                    lerp(c1[0], c2[0], inter),
+                    lerp(c1[1], c2[1], inter),
+                    lerp(c1[2], c2[2], inter)
+                ];
+
+                fill(color);
+                noStroke();
+                ellipse(x, y, 2, 2); // Smaller dot size
+
+                n++;
+            }
+        }
+
+        // Elastic effect on mouse press
+        function mousePressed() {
+            elastic = 10; // Set the elastic range
+        }
+
+        // Reset elastic effect on mouse release
+        function mouseReleased() {
+            elastic = 0; // Reset the elastic range
+        }
+
+        // Regenerate the sketch
+        function regenerateSketch() {
+            n = 0; // Reset n to start over
+            clear(); // Clear the canvas
+            text("Phyllotaxis", 10, 50);
+            loop(); // Restart the draw loop
+            
+        }
+    </script>
+</body>
+  </html>
+  
